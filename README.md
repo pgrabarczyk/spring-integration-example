@@ -1,7 +1,10 @@
 # spring-integration-example
 Example use of spring integration
 
-#Build and run
+## Choose example
+In Main class choose example by xml config. 
+
+## Build and run
 
 To build go inside project directory (where pom.xml file is), then run:
   ``` bash
