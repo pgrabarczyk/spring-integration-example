@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:c="http://www.springframework.org/schema/context"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+	xmlns:int-file="http://www.springframework.org/schema/integration/file"
+	xmlns:int-ftp="http://www.springframework.org/schema/integration/ftp"
+	xmlns:int-sftp="http://www.springframework.org/schema/integration/sftp"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/integration
+		http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/stream
+		http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+		http://www.springframework.org/schema/integration/file
+		http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+		http://www.springframework.org/schema/integration/ftp
+		http://www.springframework.org/schema/integration/ftp/spring-integration-ftp.xsd
+		http://www.springframework.org/schema/integration/sftp
+		http://www.springframework.org/schema/integration/sftp/spring-integration-sftp.xsd">
+
+	<c:property-placeholder location="classpath:application.properties" />
+
+	<int:channel id="messageChannel" />
+
+	<int:poller id="defaultPoller" default="true"
+		max-messages-per-poll="5" fixed-rate="200" />
+
+	<int-file:inbound-channel-adapter
+		channel="messageChannel"
+		directory="${file.directory.in}"
+		auto-create-directory="true" />
+
+	<bean id="sftpSessionFactory" class="org.springframework.integration.sftp.session.DefaultSftpSessionFactory">
+		<property name="host" value="${sftp.host}" />
+		<property name="port" value="${sftp.port}" />
+		<property name="user" value="${sftp.user}" />
+		<property name="password" value="${sftp.password}" />
+		<property name="allowUnknownKeys" value="true" />
+	</bean>
+
+	<int-sftp:outbound-channel-adapter
+		session-factory="sftpSessionFactory"
+		auto-create-directory="true"
+		channel="messageChannel"
+		remote-directory="${file.directory.out}"
+	/>
+
+</beans>
